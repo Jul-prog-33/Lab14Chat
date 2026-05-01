@@ -105,14 +105,30 @@ int main() {
     }
 
     SOCKET listen_sock = socket(AF_INET, SOCK_STREAM, 0);
+    if (listen_sock == INVALID_SOCKET) {
+        printf("Error creando socket servidor\n");
+        WSACleanup();
+        return 1;
+    }
 
     struct sockaddr_in addr;
     addr.sin_family = AF_INET;
     addr.sin_addr.s_addr = INADDR_ANY;
     addr.sin_port = htons(PORT);
 
-    bind(listen_sock, (struct sockaddr*)&addr, sizeof(addr));
-    listen(listen_sock, 5);
+    if (bind(listen_sock, (struct sockaddr*)&addr, sizeof(addr)) == SOCKET_ERROR) {
+        printf("Error bind. Puerto ocupado o sin permisos\n");
+        closesocket(listen_sock);
+        WSACleanup();
+        return 1;
+    }
+
+    if (listen(listen_sock, 5) == SOCKET_ERROR) {
+        printf("Error listen\n");
+        closesocket(listen_sock);
+        WSACleanup();
+        return 1;
+    }
 
     printf("Servidor en puerto %d...\n", PORT);
 
@@ -149,6 +165,10 @@ int main() {
         // ── Nueva conexión ──
         if (FD_ISSET(listen_sock, &readfds)) {
             SOCKET conn = accept(listen_sock, NULL, NULL);
+            if (conn == INVALID_SOCKET) {
+                printf("Error accept\n");
+                continue;
+            }
 
             int slot = -1;
             for (int i = 1; i <= MAX_CLIENTS; i++) {
@@ -193,6 +213,11 @@ int main() {
             switch (clients[i].state) {
 
                 case STATE_NAME: {
+                    if (strlen(buffer) == 0) {
+                        enviar(i, "Nombre invalido\n");
+                        break;
+                    }
+
                     bool usado = false;
                     for (int k = 1; k <= MAX_CLIENTS; k++) {
                         if (k != i && clients[k].s != INVALID_SOCKET &&
@@ -207,8 +232,12 @@ int main() {
                         break;
                     }
 
-                    strncpy(clients[i].name, buffer, NAME_LEN);
+                    strncpy(clients[i].name, buffer, NAME_LEN - 1);
+                    clients[i].name[NAME_LEN - 1] = '\0';
                     clients[i].state = STATE_CHOOSING;
+
+                    printf("[Servidor] Cliente slot %d registrado como '%s'\n",
+                           i, clients[i].name);
 
                     enviar(i, "Bienvenido\n");
                     enviar_lista(i);
