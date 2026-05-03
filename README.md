@@ -30,17 +30,17 @@ Sistema de chat en tiempo real implementado en C usando **Winsock2** (Windows). 
 
 ```bash
 # Servidor
-gcc servidor.c -o servidor.exe -lws2_32
+gcc servidor.cpp -o servidor.exe -lws2_32
 
 # Cliente
-gcc cliente.c -o cliente.exe -lws2_32
+gcc cliente.cpp -o cliente.exe -lws2_32
 ```
 
 **Con MSVC:**
 
 ```bash
-cl servidor.c ws2_32.lib
-cl cliente.c ws2_32.lib
+cl servidor.cpp ws2_32.lib
+cl cliente.cpp ws2_32.lib
 ```
 
 ---
@@ -115,14 +115,14 @@ Se pueden crear salas adicionales con `/join #nombre` desde cualquier cliente. E
 
 Las constantes de configuración están en la parte superior de cada archivo:
 
-**`servidor.c`**
+**`servidor.cpp`**
 ```c
 #define PORT        8888     // Puerto del servidor
 #define MAX_CLIENTS 100      // Máximo de clientes simultáneos
 #define MAX_ROOMS   10       // Máximo de salas simultáneas
 ```
 
-**`cliente.c`**
+**`cliente.cpp`**
 ```c
 #define PORT        8888          // Puerto al que conectarse
 #define SERVER_IP   "127.0.0.1"  // IP del servidor
