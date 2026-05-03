@@ -61,7 +61,7 @@ El servidor escucha en el puerto `8888` por defecto.
 ./cliente.exe
 ```
 
-Cada cliente se conecta a `127.0.0.1:8888`. Para conectarse desde otra máquina, cambia `SERVER_IP` en `cliente.c`.
+Cada cliente se conecta a `127.0.0.1:8888`. Para conectarse desde otra máquina, cambia `SERVER_IP` en `cliente.cpp`.
 
 ### 3. Flujo de conexión
 
